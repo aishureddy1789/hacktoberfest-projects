@@ -1,10 +1,16 @@
 'use client';
 
 import { Button } from '@/app/(public)/_components/button';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from '@/app/(public)/_components/dropdown-menu';
 import { ArrowUpAZ, Code } from 'lucide-react';
 import Link from 'next/link';
-import languages from '@/assets/languages.json';
 import { usePathname, useSearchParams } from 'next/navigation';
+import languages from '@/assets/languages.json';
 import { sortByName } from '@/lib/utils';
 
 const { mainLanguages } = languages;
@@ -27,150 +33,91 @@ export function Sorter() {
   const pathname = usePathname() as Pathname;
 
   const navigationItems = [
-    {
-      name: 'Best match',
-      onSelect(sp: URLSearchParams) {
-        sp.delete('o');
-        sp.delete('s');
-        return sp;
-      }
-    },
-    {
-      name: 'Most stars',
-      onSelect(sp: URLSearchParams) {
-        sp.set('s', 'stars');
-        sp.set('o', 'desc');
-        return sp;
-      }
-    },
-    {
-      name: 'Fewest stars',
-      onSelect(sp: URLSearchParams) {
-        sp.set('s', 'stars');
-        sp.set('o', 'asc');
-        return sp;
-      }
-    },
-    {
-      name: 'Most forks',
-      onSelect(sp: URLSearchParams) {
-        sp.set('s', 'forks');
-        sp.set('o', 'desc');
-        return sp;
-      }
-    },
-    {
-      name: 'Fewest forks',
-      onSelect(sp: URLSearchParams) {
-        sp.set('s', 'forks');
-        sp.set('o', 'asc');
-        return sp;
-      }
-    },
-    {
-      name: 'Most help wanted issues',
-      onSelect(sp: URLSearchParams) {
-        sp.set('s', 'help-wanted-issues');
-        sp.set('o', 'desc');
-        return sp;
-      }
-    },
-    {
-      name: 'Recently updated',
-      onSelect(sp: URLSearchParams) {
-        sp.set('s', 'updated');
-        sp.set('o', 'desc');
-        return sp;
-      }
-    },
-    {
-      name: 'Least recently updated',
-      onSelect(sp: URLSearchParams) {
-        sp.set('s', 'updated');
-        sp.set('o', 'asc');
-        return sp;
-      }
-    }
+    { name: 'Best match', s: '', o: '' },
+    { name: 'Most stars', s: 'stars', o: 'desc' },
+    { name: 'Fewest stars', s: 'stars', o: 'asc' },
+    { name: 'Most forks', s: 'forks', o: 'desc' },
+    { name: 'Fewest forks', s: 'forks', o: 'asc' },
+    { name: 'Most help wanted issues', s: 'help-wanted-issues', o: 'desc' },
+    { name: 'Recently updated', s: 'updated', o: 'desc' },
+    { name: 'Least recently updated', s: 'updated', o: 'asc' }
   ];
 
   function selectedSort(): SortTypes {
-    if (searchParams.get('o') === 'asc') {
-      if (searchParams.get('s') === 'stars') return SortTypes.FewestStars;
-      if (searchParams.get('s') === 'forks') return SortTypes.FewestForks;
-      if (searchParams.get('s') === 'updated')
-        return SortTypes.LeastRecentlyUpdated;
-      return SortTypes.BestMatch;
-    } else if (searchParams.get('o') === 'desc') {
-      if (searchParams.get('s') === 'stars') return SortTypes.MostStars;
-      if (searchParams.get('s') === 'forks') return SortTypes.MostForks;
-      if (searchParams.get('s') === 'updated') return SortTypes.RecentlyUpdated;
-      if (searchParams.get('s') === 'help-wanted-issues')
-        return SortTypes.MostHelpWantedIssues;
-      return SortTypes.BestMatch;
-    } else {
-      return SortTypes.BestMatch;
-    }
-  }
-
-  function handleClick() {
-    const elem = document.activeElement as HTMLElement;
-    elem?.blur();
+    const s = searchParams.get('s');
+    const o = searchParams.get('o');
+    if (!s && !o) return SortTypes.BestMatch;
+    if (s === 'stars' && o === 'desc') return SortTypes.MostStars;
+    if (s === 'stars' && o === 'asc') return SortTypes.FewestStars;
+    if (s === 'forks' && o === 'desc') return SortTypes.MostForks;
+    if (s === 'forks' && o === 'asc') return SortTypes.FewestForks;
+    if (s === 'help-wanted-issues') return SortTypes.MostHelpWantedIssues;
+    if (s === 'updated' && o === 'desc') return SortTypes.RecentlyUpdated;
+    if (s === 'updated' && o === 'asc') return SortTypes.LeastRecentlyUpdated;
+    return SortTypes.BestMatch;
   }
 
   return (
-    <div className="flex items-center justify-center gap-4 mb-8">
-      <div className="dropdown group dropdown-hover">
-        <Button tabIndex={0}>
-          <Code className="w-6 h-6 mr-2" />
-          Language
-        </Button>
-        <div className="z-[9999] h-64 p-2 overflow-y-auto shadow-lg dropdown-content hidden group-hover:block bg-white/95 backdrop-blur-sm rounded-xl w-60 border border-gray-200/50">
-          <ul tabIndex={0} className="menu menu-vertical">
-            {mainLanguages.sort(sortByName).map(language => {
-              const sp = new URLSearchParams(searchParams);
-              sp.delete('p');
-              return (
-                <li key={language} onClick={handleClick}>
-                  <Link
-                    href={`/repos/${language.toLowerCase()}?${sp.toString()}`}
-                    className="text-gray-700 hover:text-white hover:bg-hacktoberfest-light-blue rounded-lg transition-colors duration-200 px-3 py-2"
-                  >
-                    {language}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </div>
-      <div className="dropdown dropdown-hover group">
-        <Button tabIndex={0}>
-          <ArrowUpAZ className="w-6 h-6 mr-2" />
-          {selectedSort()}
-        </Button>
-        <div className="z-[9999] h-64 p-2 overflow-y-auto shadow-lg dropdown-content hidden group-hover:block -ml-16 bg-white/95 backdrop-blur-sm rounded-xl w-60 border border-gray-200/50">
-          <ul tabIndex={0} className="menu menu-vertical">
-            {navigationItems.map((item, index) => {
-              const sp = item.onSelect(new URLSearchParams(searchParams));
-              sp.delete('p');
-              if (item.name === SortTypes.BestMatch) {
-                sp.delete('o');
-                sp.delete('s');
-              }
-              return (
-                <li key={index} onClick={handleClick}>
-                  <Link
-                    href={`${pathname}?${sp.toString()}`}
-                    className="text-gray-700 hover:text-white hover:bg-hacktoberfest-light-blue rounded-lg transition-colors duration-200 px-3 py-2"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </div>
+    <div className="flex lg:flex-col w-full gap-4 px-4 py-2 mb-4 lg:mb-0">
+      {/* Language Dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button className="flex items-center gap-2">
+            <Code className="w-5 h-5" />
+            Language
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          className="max-h-64 overflow-y-auto w-60 bg-hacktoberfest-blue border-neutral-800 shadow-md rounded-xl"
+        >
+          {mainLanguages.sort(sortByName).map(language => {
+            const sp = new URLSearchParams(searchParams);
+            sp.delete('p');
+            return (
+              <DropdownMenuItem key={language} asChild>
+                <Link
+                  href={`/repos/${language.toLowerCase()}?${sp.toString()}`}
+                  className="w-full"
+                >
+                  {language}
+                </Link>
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Sort Dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button className="flex items-center gap-2">
+            <ArrowUpAZ className="w-5 h-5" />
+            {selectedSort()}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          className="max-h-64 overflow-y-auto w-60 bg-hacktoberfest-blue border-neutral-800 shadow-md rounded-xl"
+        >
+          {navigationItems.map(item => {
+            const sp = new URLSearchParams(searchParams);
+            if (item.s) sp.set('s', item.s);
+            else sp.delete('s');
+            if (item.o) sp.set('o', item.o);
+            else sp.delete('o');
+            sp.delete('p');
+
+            return (
+              <DropdownMenuItem key={item.name} asChild>
+                <Link href={`${pathname}?${sp.toString()}`} className="w-full">
+                  {item.name}
+                </Link>
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }

@@ -16,7 +16,7 @@ export default async function ContributorsPage() {
 
   return (
     <div>
-      <Header />
+      {/*<Header />*/}
       <div className="container mx-auto mb-5 space-y-8 mt-36">
         <h1 className="text-4xl sm:text-5xl font-medium text-center text-neutral-100">
           Contributors ✨

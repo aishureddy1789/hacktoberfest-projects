@@ -54,11 +54,8 @@ export function StarsFilter() {
   }
 
   return (
-    <form
-      className="w-full px-4 mx-auto mb-4 sm:w-3/4 xl:w-2/4 form-control"
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch">
+    <form className="w-full form-control mb-4 lg:mb-0" onSubmit={handleSubmit(onSubmit)}>
+      <div className="flex flex-col gap-3 items-stretch w-auto">
         <Controller
           name="startStars"
           render={({ field }) => (

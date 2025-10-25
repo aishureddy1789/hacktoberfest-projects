@@ -35,7 +35,7 @@ export default async function ReposPage({
 
   return (
     <>
-      <Header />
+      {/*<Header />*/}
       <ScrollToTop />
       <div className="w-full overflow-x-hidden">
         <div className="container mx-auto px-4 pt-32 sm:pt-36 md:pt-40 pb-8">
@@ -53,8 +53,10 @@ export default async function ReposPage({
                 </h1>
               </div>
             </div>
-            <Sorter />
-            <StarsFilter />
+            <div className="display lg:hidden">
+              <Sorter />
+              <StarsFilter />
+            </div>
             <div className="grid grid-cols-1 gap-6 px-2 sm:px-4 sm:grid-cols-2 lg:grid-cols-3">
               {repos.items.map(repo => (
                 <RepoCard key={repo.id} repo={repo} />
